@@ -6,6 +6,11 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -26,11 +31,82 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		try {
-			initNmap();
-		} catch (IOException e) {
-			e.printStackTrace();
+		initNmap();
+	}
+
+	private void initNmap() {
+		SharedPreferences sp = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		String version = sp.getString("NMAP_VERSION", "");
+		if (!version.equals(NMAP_VERSION)) {
+			ProgressDialog p = ProgressDialog
+					.show(MainActivity.this, "Installing Nmap",
+							"Please wait while Nmap is installed. This should only happen once.");
+			new Thread(new InstallNmapTask(p)).start();
 		}
+	}
+
+	private class InstallNmapTask implements Runnable {
+		private ProgressDialog mProgress;
+
+		public InstallNmapTask(ProgressDialog progress) {
+			mProgress = progress;
+		}
+
+		@Override
+		public void run() {
+			SharedPreferences sp = PreferenceManager
+					.getDefaultSharedPreferences(MainActivity.this);
+
+			try {
+				FileUtils.extractAssetDirectory(MainActivity.this, NMAP_DIR);
+				FileUtils.chmod(getFilesDir().getCanonicalPath() + '/'
+						+ NMAP_DIR, "744", true);
+				boolean result = sp.edit()
+						.putString("NMAP_VERSION", NMAP_VERSION).commit();
+				if (!result) {
+					Log.e("MainActivity", "Writing new version failed");
+					throw new IOException();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+
+				mProgress.dismiss();
+
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						new AlertDialog.Builder(MainActivity.this)
+								.setMessage(
+										"Nmap installation failed, please try again. If the problem continues, please contact the developer. Exiting.")
+								.setPositiveButton("Exit",
+										new OnClickListener() {
+											@Override
+											public void onClick(
+													DialogInterface dialog,
+													int which) {
+												finish();
+											}
+										}).create().show();
+					}
+				});
+			}
+			mProgress.dismiss();
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	public void runClicked(View v) {
+		EditText editText = (EditText) findViewById(R.id.hostname);
+		String host = editText.getText().toString();
+		List<String> args = ArgumentToggleButton.getArguments();
+		runNmap(host, args);
 	}
 
 	public void runNmap(String host, List<String> args) {
@@ -77,36 +153,5 @@ public class MainActivity extends Activity {
 			sb.append(" ");
 		}
 		commandView.setText(sb.toString());
-	}
-
-	private void initNmap() throws IOException {
-		SharedPreferences sp = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		String version = sp.getString("NMAP_VERSION", "");
-		if (!version.equals(NMAP_VERSION)) {
-			FileUtils.extractAssetDirectory(this, NMAP_DIR);
-			FileUtils.chmod(getFilesDir().getCanonicalPath() + '/' + NMAP_DIR,
-					"744", true);
-			boolean result = sp.edit().putString("NMAP_VERSION", NMAP_VERSION)
-					.commit();
-			if (!result) {
-				Log.e("MainActivity", "Writing new version failed");
-				throw new IOException();
-			}
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	public void runClicked(View v) {
-		EditText editText = (EditText) findViewById(R.id.hostname);
-		String host = editText.getText().toString();
-		List<String> args = ArgumentToggleButton.getArguments();
-		runNmap(host, args);
 	}
 }
