@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -25,17 +27,16 @@ public class MainActivity extends Activity {
 
 		try {
 			initNmap();
-			runNmap();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void runNmap() {
+	public void runNmap(String host) {
 		try {
 			String internalDirPath = getFilesDir().getCanonicalPath();
 			ProcessBuilder pb = new ProcessBuilder(internalDirPath
-					+ "/nmap/bin/nmap", "localhost");
+					+ "/nmap/bin/nmap", host);
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
 			BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -79,5 +80,11 @@ public class MainActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	public void runClicked(View v) {
+		EditText editText = (EditText) findViewById(R.id.host);
+		String host = editText.getText().toString();
+		runNmap(host);
 	}
 }
