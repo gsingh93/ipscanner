@@ -83,7 +83,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void runClicked(View v) {
-		EditText editText = (EditText) findViewById(R.id.host);
+		EditText editText = (EditText) findViewById(R.id.hostname);
 		String host = editText.getText().toString();
 		runNmap(host);
 	}

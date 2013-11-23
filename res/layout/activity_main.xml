@@ -15,18 +15,18 @@
         android:layout_height="wrap_content" >
 
         <EditText
-            android:id="@+id/host"
+            android:id="@+id/hostname"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".8"
-            android:hint="IP Address" />
+            android:hint="@string/hostname_hint" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".2"
             android:onClick="runClicked"
-            android:text="Run" />
+            android:text="@string/run_button" />
     </LinearLayout>
 
     <LinearLayout
