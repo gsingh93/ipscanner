@@ -29,14 +29,26 @@
             android:text="@string/run_button" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/command"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
 
         <com.gulshansingh.ipscanner.ArgumentToggleButton
+            android:id="@+id/sync_toggle_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:argument="-sS" />
+
+        <com.gulshansingh.ipscanner.ArgumentToggleButton
+            android:id="@+id/no_ping_toggle_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:argument="-Pn" />
     </LinearLayout>
 
     <HorizontalScrollView

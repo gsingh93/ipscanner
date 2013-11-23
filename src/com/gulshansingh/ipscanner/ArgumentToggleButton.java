@@ -1,5 +1,7 @@
 package com.gulshansingh.ipscanner;
 
+import java.util.List;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -53,5 +55,9 @@ public class ArgumentToggleButton extends ToggleButton {
 				mArgGenerator.setArg(mArgument, isChecked);
 			}
 		});
+	}
+
+	public static List<String> getArguments() {
+		return mArgGenerator.generateArgumentList();
 	}
 }

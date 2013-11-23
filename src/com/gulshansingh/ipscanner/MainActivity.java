@@ -3,6 +3,7 @@ package com.gulshansingh.ipscanner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -32,11 +33,15 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	public void runNmap(String host) {
+	public void runNmap(String host, List<String> args) {
 		try {
 			String internalDirPath = getFilesDir().getCanonicalPath();
-			ProcessBuilder pb = new ProcessBuilder(internalDirPath
-					+ "/nmap/bin/nmap", host);
+			args.set(0, internalDirPath + "/nmap/bin/nmap");
+			args.set(1, host);
+
+			setCommandTextView(args);
+
+			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
 			BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -56,6 +61,22 @@ public class MainActivity extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void setCommandTextView(List<String> args) {
+		TextView commandView = (TextView) findViewById(R.id.command);
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (String arg : args) {
+			if (first) {
+				sb.append("nmap");
+				first = false;
+			} else {
+				sb.append(arg);
+			}
+			sb.append(" ");
+		}
+		commandView.setText(sb.toString());
 	}
 
 	private void initNmap() throws IOException {
@@ -85,6 +106,7 @@ public class MainActivity extends Activity {
 	public void runClicked(View v) {
 		EditText editText = (EditText) findViewById(R.id.hostname);
 		String host = editText.getText().toString();
-		runNmap(host);
+		List<String> args = ArgumentToggleButton.getArguments();
+		runNmap(host, args);
 	}
 }
