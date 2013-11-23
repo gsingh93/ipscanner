@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -46,6 +47,7 @@ public class MainActivity extends Activity {
 					sb.append(line).append('\n');
 				}
 				TextView results = (TextView) findViewById(R.id.results);
+				results.setTypeface(Typeface.MONOSPACE);
 				results.setText(sb.toString());
 			} catch (IOException e) {
 				e.printStackTrace();
