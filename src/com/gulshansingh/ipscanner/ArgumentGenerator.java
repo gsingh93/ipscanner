@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 public class ArgumentGenerator {
-	private Set<String> args = new HashSet<String>();
+	private Set<Argument> args = new HashSet<Argument>();
 
-	public void setArg(String arg, boolean enable) {
+	public void setArg(Argument arg, boolean enable) {
 		if (enable) {
 			args.add(arg);
 		} else {
@@ -16,11 +16,23 @@ public class ArgumentGenerator {
 		}
 	}
 
+	public void clear() {
+		args = new HashSet<Argument>();
+	}
+
 	public List<String> generateArgumentList() {
 		List<String> argList = new ArrayList<String>();
-		argList.add("");
-		argList.add("");
-		argList.addAll(args);
+		for (Argument arg : args) {
+			addArgument(argList, arg);
+		}
 		return argList;
+	}
+
+	private void addArgument(List<String> l, Argument arg) {
+		l.add(arg.getName());
+		String argVal = arg.getArg();
+		if (argVal != null) {
+			l.add(argVal);
+		}
 	}
 }

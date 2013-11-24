@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <declare-styleable name="ArgumentToggleButton">
-        <attr name="android:text"/>
+        <attr name="android:text" />
+        <attr name="label" format="string" />
         <attr name="argument" format="string" />
+        <attr name="takes_arg" format="boolean" />
     </declare-styleable>
+
 </resources>

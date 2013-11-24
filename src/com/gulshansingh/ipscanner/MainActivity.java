@@ -3,6 +3,7 @@ package com.gulshansingh.ipscanner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -10,7 +11,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -32,6 +32,14 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		initNmap();
+
+		// ArgumentToggleButton.setArgumentGenerator(new ArgumentGenerator());
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		ArgumentToggleButton.resetArgumentGenerator();
 	}
 
 	private void initNmap() {
@@ -111,13 +119,15 @@ public class MainActivity extends Activity {
 
 	public void runNmap(String host, List<String> args) {
 		try {
+			List<String> argList = new ArrayList<String>();
 			String internalDirPath = getFilesDir().getCanonicalPath();
-			args.set(0, internalDirPath + "/nmap/bin/nmap");
-			args.set(1, host);
+			argList.add(internalDirPath + "/nmap/bin/nmap");
+			argList.add(host);
+			argList.addAll(args);
 
-			setCommandTextView(args);
+			setCommandTextView(argList);
 
-			ProcessBuilder pb = new ProcessBuilder(args);
+			ProcessBuilder pb = new ProcessBuilder(argList);
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
 			BufferedReader br = new BufferedReader(new InputStreamReader(
