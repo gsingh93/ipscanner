@@ -29,11 +29,6 @@
             android:text="@string/run_button" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/command"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
@@ -49,7 +44,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:argument="-Pn" />
+
+        <com.gulshansingh.ipscanner.ArgumentToggleButton
+            android:id="@+id/port_toggle_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:argument="-p"
+            app:label="Port"
+            app:takes_arg="true" />
     </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/command"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:freezesText="true" />
+    </HorizontalScrollView>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -62,7 +76,8 @@
             <TextView
                 android:id="@+id/results"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:freezesText="true" />
         </HorizontalScrollView>
     </ScrollView>
 
