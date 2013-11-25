@@ -105,6 +105,7 @@ public class ArgumentToggleButton extends ToggleButton {
 					AlertDialog.Builder b = new AlertDialog.Builder(
 							getContext());
 					b.setTitle("Enter " + mLabel)
+							.setCancelable(false)
 							.setView(editText)
 							.setPositiveButton("Set",
 									new Dialog.OnClickListener() {
@@ -123,19 +124,21 @@ public class ArgumentToggleButton extends ToggleButton {
 												setChecked(false);
 											}
 										}
+									})
+							.setNegativeButton("Cancel",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog, int id) {
+											setChecked(false);
+											dialog.cancel();
+										}
 									}).create().show();
 				} else { // Doesn't take an argument
 					mArg = new Argument(mArgumentName);
-					boolean result = mArgGenerator.setArg(mArg, true);
-					if (!result) {
-						setChecked(false);
-					}
+					mArgGenerator.setArg(mArg, true);
 				}
 			} else { // Unchecking
-				boolean result = mArgGenerator.setArg(mArg, false);
-				if (!result) {
-					setChecked(false);
-				}
+				mArgGenerator.setArg(mArg, false);
 			}
 		}
 	}
