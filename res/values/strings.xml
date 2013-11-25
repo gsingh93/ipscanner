@@ -3,7 +3,9 @@
 
     <string name="app_name">IPScanner</string>
     <string name="action_settings">Settings</string>
+    <string name="action_man_nmap">man nmap</string>
     <string name="run_button">Run</string>
     <string name="hostname_hint">Hostname or IP Address</string>
+    <string name="title_activity_man">ManActivity</string>
 
 </resources>

@@ -25,6 +25,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.gulshansingh.ipscanner.ManActivity"
+            android:label="@string/title_activity_man"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>
