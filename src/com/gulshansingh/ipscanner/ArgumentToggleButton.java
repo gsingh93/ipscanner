@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ToggleButton;
@@ -66,21 +67,46 @@ public class ArgumentToggleButton extends ToggleButton {
 		setTextOff(buttonText);
 		setText(buttonText);
 
-		setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				final Error e = new Error();
-				// If the user is enabling an argument and the argument takes an
-				// argument, show an input dialog
-				if (isChecked() && takesArg) {
+		setOnClickListener(new ClickListener(argumentName, takesArg, label));
+	}
+
+	public static List<String> getArguments() {
+		return mArgGenerator.generateArgumentList();
+	}
+
+	public static void resetArgumentGenerator() {
+		mArgGenerator.clear();
+	}
+
+	private class ClickListener implements OnClickListener {
+		private String mArgumentName;
+		private boolean mTakesArg;
+		private String mLabel;
+
+		public ClickListener(String argumentName, boolean takesArg, String label) {
+			mArgumentName = argumentName;
+			mTakesArg = takesArg;
+			mLabel = label;
+		}
+
+		@Override
+		public void onClick(View v) {
+			final Error e = new Error();
+			// If the user is enabling an argument and the argument takes an
+			// argument, show an input dialog
+			if (isChecked()) {
+				if (mTakesArg) {
 					final EditText editText = new EditText(getContext());
+					if (mArg != null) {
+						String argVal = mArg.getArg();
+						if (argVal != null) {
+							editText.setText(argVal);
+							editText.setSelection(argVal.length());
+						}
+					}
 					AlertDialog.Builder b = new AlertDialog.Builder(
 							getContext());
-					// View inputView =
-					// LayoutInflater.from(getContext()).inflate(
-					// R.layout.argument_input, null);
-					b.setTitle("Enter " + label)
-							.setMessage(label + ":")
+					b.setTitle("Enter " + mLabel)
 							.setView(editText)
 							.setPositiveButton("Set",
 									new Dialog.OnClickListener() {
@@ -91,32 +117,26 @@ public class ArgumentToggleButton extends ToggleButton {
 											String text = editText.getText()
 													.toString();
 
-											mArg = new Argument(argumentName,
+											mArg = new Argument(mArgumentName,
 													text);
 											mArgGenerator.setArg(mArg, true);
 										}
 									}).create().show();
-				} else {
-					mArg = new Argument(argumentName);
-					mArgGenerator.setArg(mArg, isChecked());
+				} else { // Doesn't take an argument
+					mArg = new Argument(mArgumentName);
+					mArgGenerator.setArg(mArg, true);
 				}
-
-				if (e.error) {
-					setChecked(false);
-				}
+			} else { // Unchecking
+				mArgGenerator.setArg(mArg, false);
 			}
-		});
-	}
 
-	private static class Error {
-		public boolean error;
-	}
+			if (e.error) {
+				setChecked(false);
+			}
+		}
 
-	public static List<String> getArguments() {
-		return mArgGenerator.generateArgumentList();
-	}
-
-	public static void resetArgumentGenerator() {
-		mArgGenerator.clear();
+		private class Error {
+			public boolean error;
+		}
 	}
 }
