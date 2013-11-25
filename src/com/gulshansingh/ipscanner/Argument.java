@@ -3,6 +3,7 @@ package com.gulshansingh.ipscanner;
 public class Argument {
 	private String mName;
 	private String mArg;
+	private int mNumArgs;
 
 	public Argument(String name) {
 		mName = name;
@@ -11,6 +12,16 @@ public class Argument {
 	public Argument(String name, String arg) {
 		mName = name;
 		mArg = arg;
+		mNumArgs = 1;
+	}
+
+	public boolean isValid() {
+		if (mNumArgs == 1) {
+			if (mArg == null || mArg.equals("")) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public String getName() {

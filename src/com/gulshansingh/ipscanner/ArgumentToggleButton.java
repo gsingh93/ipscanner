@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ToggleButton;
@@ -91,7 +90,6 @@ public class ArgumentToggleButton extends ToggleButton {
 
 		@Override
 		public void onClick(View v) {
-			final Error e = new Error();
 			// If the user is enabling an argument and the argument takes an
 			// argument, show an input dialog
 			if (isChecked()) {
@@ -119,24 +117,26 @@ public class ArgumentToggleButton extends ToggleButton {
 
 											mArg = new Argument(mArgumentName,
 													text);
-											mArgGenerator.setArg(mArg, true);
+											boolean result = mArgGenerator
+													.setArg(mArg, true);
+											if (!result) {
+												setChecked(false);
+											}
 										}
 									}).create().show();
 				} else { // Doesn't take an argument
 					mArg = new Argument(mArgumentName);
-					mArgGenerator.setArg(mArg, true);
+					boolean result = mArgGenerator.setArg(mArg, true);
+					if (!result) {
+						setChecked(false);
+					}
 				}
 			} else { // Unchecking
-				mArgGenerator.setArg(mArg, false);
+				boolean result = mArgGenerator.setArg(mArg, false);
+				if (!result) {
+					setChecked(false);
+				}
 			}
-
-			if (e.error) {
-				setChecked(false);
-			}
-		}
-
-		private class Error {
-			public boolean error;
 		}
 	}
 }

@@ -8,12 +8,16 @@ import java.util.Set;
 public class ArgumentGenerator {
 	private Set<Argument> args = new HashSet<Argument>();
 
-	public void setArg(Argument arg, boolean enable) {
+	public boolean setArg(Argument arg, boolean enable) {
+		if (!arg.isValid()) {
+			return false;
+		}
 		if (enable) {
 			args.add(arg);
 		} else {
 			args.remove(arg);
 		}
+		return true;
 	}
 
 	public void clear() {
