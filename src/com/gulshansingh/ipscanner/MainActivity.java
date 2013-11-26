@@ -3,12 +3,14 @@ package com.gulshansingh.ipscanner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteOrder;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+
+import org.apache.http.conn.util.InetAddressUtils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -19,7 +21,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -234,25 +235,32 @@ public class MainActivity extends Activity {
 	}
 
 	private String getIpAddress() {
-		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
-		int ipAddress = wifiManager.getConnectionInfo().getIpAddress();
+		// Fallback address
+		String ipv6Addr = null;
 
-		// Convert little-endian to big-endian if needed
-		if (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
-			ipAddress = Integer.reverseBytes(ipAddress);
-		}
-
-		byte[] ipByteArray = BigInteger.valueOf(ipAddress).toByteArray();
-
-		String ipAddressString;
 		try {
-			ipAddressString = InetAddress.getByAddress(ipByteArray)
-					.getHostAddress();
-		} catch (UnknownHostException ex) {
-			Log.e("MainActivity", "Unable to get host address.");
-			ipAddressString = null;
+			List<NetworkInterface> interfaces = Collections
+					.list(NetworkInterface.getNetworkInterfaces());
+			for (NetworkInterface intf : interfaces) {
+				List<InetAddress> addrs = Collections.list(intf
+						.getInetAddresses());
+				for (InetAddress addr : addrs) {
+					if (!addr.isLoopbackAddress()) {
+						String sAddr = addr.getHostAddress().toUpperCase(
+								Locale.US);
+						boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
+						if (isIPv4) {
+							return sAddr;
+						} else {
+							ipv6Addr = sAddr;
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
-		return ipAddressString;
+		return ipv6Addr;
 	}
 }
