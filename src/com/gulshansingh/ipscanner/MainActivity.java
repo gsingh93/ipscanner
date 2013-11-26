@@ -9,7 +9,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -33,10 +34,19 @@ public class MainActivity extends Activity {
 	private static final String NMAP_DIR = "nmap";
 	private static final String NMAP_VERSION = "5.61TEST4";
 
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		TextView command = (TextView) findViewById(R.id.command);
+		TextView results = (TextView) findViewById(R.id.results);
+
+		if (Build.VERSION.SDK_INT >= 11) {
+			command.setTextIsSelectable(true);
+			results.setTextIsSelectable(true);
+		}
 
 		initNmap();
 	}
