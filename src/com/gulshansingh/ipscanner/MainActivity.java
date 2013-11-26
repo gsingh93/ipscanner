@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -150,38 +151,69 @@ public class MainActivity extends Activity {
 		EditText editText = (EditText) findViewById(R.id.hostname);
 		String host = editText.getText().toString();
 		List<String> args = ArgumentToggleButton.getArguments();
-		runNmap(host, args);
+		ProgressDialog progress = new ProgressDialog(this);
+		progress.setCancelable(false);
+		progress.setTitle("Running command");
+		progress.setMessage("Running command, please wait.");
+		progress.show();
+		new Thread(new RunNmap(host, args, progress)).start();
 	}
 
-	public void runNmap(String host, List<String> args) {
-		try {
-			List<String> argList = new ArrayList<String>();
-			String internalDirPath = getFilesDir().getCanonicalPath();
-			argList.add(internalDirPath + "/nmap/bin/nmap");
-			argList.add(host);
-			argList.addAll(args);
+	public class RunNmap implements Runnable {
+		private String mHost;
+		private List<String> mArgs;
+		private ProgressDialog mProgress;
 
-			setCommandTextView(argList);
+		public RunNmap(String host, List<String> args, ProgressDialog progress) {
+			mHost = host;
+			mArgs = args;
+			mProgress = progress;
+		}
 
-			ProcessBuilder pb = new ProcessBuilder(argList);
-			pb.redirectErrorStream(true);
-			Process process = pb.start();
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					process.getInputStream()));
-			String line;
+		@Override
+		public void run() {
 			try {
-				StringBuilder sb = new StringBuilder();
-				while ((line = br.readLine()) != null) {
-					sb.append(line).append('\n');
+				final List<String> argList = new ArrayList<String>();
+				String internalDirPath = getFilesDir().getCanonicalPath();
+				argList.add(internalDirPath + "/nmap/bin/nmap");
+				argList.add(mHost);
+				argList.addAll(mArgs);
+
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						setCommandTextView(argList);
+					}
+				});
+
+				ProcessBuilder pb = new ProcessBuilder(argList);
+				pb.redirectErrorStream(true);
+				Process process = pb.start();
+				BufferedReader br = new BufferedReader(new InputStreamReader(
+						process.getInputStream()));
+				String line;
+				try {
+					final StringBuilder sb = new StringBuilder();
+					while ((line = br.readLine()) != null) {
+						sb.append(line).append('\n');
+					}
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							TextView results = (TextView) findViewById(R.id.results);
+							results.setTypeface(Typeface.MONOSPACE);
+							results.setText(sb.toString());
+						}
+					});
+
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-				TextView results = (TextView) findViewById(R.id.results);
-				results.setTypeface(Typeface.MONOSPACE);
-				results.setText(sb.toString());
 			} catch (IOException e) {
 				e.printStackTrace();
+			} finally {
+				mProgress.dismiss();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
