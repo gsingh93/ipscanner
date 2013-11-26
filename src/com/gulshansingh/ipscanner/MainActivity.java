@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
 			if (ipAddress != null) {
 				message = "Your IP address is " + ipAddress;
 			} else {
-				message = "Could not get IP address. Are you sure you're connected to a WiFi network?";
+				message = "Could not get IP address. Please check if you have a WiFi or data connection.";
 			}
 			b.setTitle("IP Address").setMessage(message).create().show();
 			break;
