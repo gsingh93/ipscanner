@@ -8,5 +8,6 @@
     <string name="run_button">Run</string>
     <string name="hostname_hint">Hostname or IP Address</string>
     <string name="title_activity_man">ManActivity</string>
+    <string name="beginner_explanation">A few Nmap options have been provided as buttons below, but more can be specified in the input field. All Nmap arguments can be found in the manpage provided in the options menu.</string>
 
 </resources>
