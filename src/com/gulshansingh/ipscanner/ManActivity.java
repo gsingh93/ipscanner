@@ -6,43 +6,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.webkit.WebView;
 
 public class ManActivity extends Activity {
 
-	private static final String MAN_FILE = "nmap.txt";
+	private static final String MAN_FILE = "nmap.html";
 	private static String mManText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_man);
-		AlertDialog.Builder b = new AlertDialog.Builder(this);
-		b.setTitle("Loading")
-				.setMessage(
-						"It may take a few seconds for the manpage to load. This will be fixed in future versions.")
-				.setCancelable(false)
-				.setPositiveButton("Ok", new OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						new Thread(new ManPageLoader()).start();
-					}
-				}).setNegativeButton("Go back", new OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				}).create().show();
+		new Thread(new ManPageLoader()).start();
 	}
 
 	private class ManPageLoader implements Runnable {
 		@Override
 		public void run() {
-			// if (mManText == null) {
 			try {
 				InputStream is = getAssets().open(MAN_FILE);
 				BufferedReader br = new BufferedReader(
@@ -56,12 +37,14 @@ public class ManActivity extends Activity {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			// }
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					TextView manTextView = (TextView) findViewById(R.id.man_text);
-					manTextView.setText(mManText);
+					StringBuilder sb = new StringBuilder("<html><body><pre>");
+					sb.append(mManText);
+					sb.append("</pre></body></html>");
+					WebView manWebView = (WebView) findViewById(R.id.man_text);
+					manWebView.loadData(sb.toString(), "text/html", "UTF-8");
 				}
 			});
 		}

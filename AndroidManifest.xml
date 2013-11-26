@@ -28,8 +28,7 @@
         </activity>
         <activity
             android:name="com.gulshansingh.ipscanner.ManActivity"
-            android:label="@string/title_activity_man"
-            android:screenOrientation="portrait" >
+            android:label="@string/title_activity_man" >
         </activity>
     </application>
 
