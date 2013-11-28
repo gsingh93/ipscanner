@@ -24,7 +24,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".8"
-            android:hint="@string/hostname_hint" />
+            android:hint="@string/hostname_hint"
+            android:inputType="textNoSuggestions" />
 
         <Button
             android:layout_width="0dp"

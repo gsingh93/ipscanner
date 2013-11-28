@@ -165,40 +165,36 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public void runClicked(View v) {
-		EditText editText = (EditText) findViewById(R.id.hostname);
-		String host = editText.getText().toString();
-		List<String> args = ArgumentToggleButton.getArguments();
-		showProgressDialog("Running command", "Running command, please wait.",
-				RUN_DIALOG_TAG);
-		new Thread(new RunNmap(host, args)).start();
+		try {
+			EditText editText = (EditText) findViewById(R.id.hostname);
+			String host = editText.getText().toString();
+
+			List<String> argList = ArgumentToggleButton.getArguments();
+			List<String> args = new ArrayList<String>();
+			String internalDirPath = getFilesDir().getCanonicalPath();
+			args.add(internalDirPath + "/nmap/bin/nmap");
+			args.add(host);
+			args.addAll(argList);
+
+			showProgressDialog("Running command", "Running command: "
+					+ getCommandText(args), RUN_DIALOG_TAG);
+			new Thread(new RunNmap(args)).start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public class RunNmap implements Runnable {
-		private String mHost;
 		private List<String> mArgs;
 
-		public RunNmap(String host, List<String> args) {
-			mHost = host;
+		public RunNmap(List<String> args) {
 			mArgs = args;
 		}
 
 		@Override
 		public void run() {
 			try {
-				final List<String> argList = new ArrayList<String>();
-				String internalDirPath = getFilesDir().getCanonicalPath();
-				argList.add(internalDirPath + "/nmap/bin/nmap");
-				argList.add(mHost);
-				argList.addAll(mArgs);
-
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						setCommandTextView(argList);
-					}
-				});
-
-				ProcessBuilder pb = new ProcessBuilder(argList);
+				ProcessBuilder pb = new ProcessBuilder(mArgs);
 				pb.redirectErrorStream(true);
 				Process process = pb.start();
 				BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -211,9 +207,12 @@ public class MainActivity extends FragmentActivity {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
+						TextView command = (TextView) findViewById(R.id.command);
 						TextView results = (TextView) findViewById(R.id.results);
 						results.setTypeface(Typeface.MONOSPACE);
+						command.setTypeface(Typeface.MONOSPACE);
 						results.setText(sb.toString());
+						command.setText("$ " + getCommandText(mArgs));
 					}
 				});
 			} catch (IOException e) {
@@ -224,8 +223,7 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
-	private void setCommandTextView(List<String> args) {
-		TextView commandView = (TextView) findViewById(R.id.command);
+	private String getCommandText(List<String> args) {
 		StringBuilder sb = new StringBuilder();
 		boolean first = true;
 		for (String arg : args) {
@@ -237,7 +235,8 @@ public class MainActivity extends FragmentActivity {
 			}
 			sb.append(" ");
 		}
-		commandView.setText(sb.toString());
+
+		return sb.toString();
 	}
 
 	private String getIpAddress() {
