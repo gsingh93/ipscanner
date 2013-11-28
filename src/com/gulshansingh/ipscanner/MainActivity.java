@@ -13,9 +13,7 @@ import java.util.Locale;
 import org.apache.http.conn.util.InetAddressUtils;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -24,6 +22,8 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,10 +31,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 
 	private static final String NMAP_DIR = "nmap";
 	private static final String NMAP_VERSION = "5.61TEST4";
+	private static final String INSTALL_DIALOG_TAG = "install_dialog";
+	private static final String RUN_DIALOG_TAG = "run_dialog";
+	private static boolean installing = false;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -87,25 +90,38 @@ public class MainActivity extends Activity {
 		ArgumentToggleButton.resetArgumentGenerator();
 	}
 
+	// Need to remove the new fragment that is created on a rotate
 	private void initNmap() {
 		SharedPreferences sp = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		String version = sp.getString("NMAP_VERSION", "");
-		if (!version.equals(NMAP_VERSION)) {
-			ProgressDialog p = ProgressDialog
-					.show(MainActivity.this, "Installing Nmap",
-							"Please wait while Nmap is installed. This should only happen once.");
-			new Thread(new InstallNmapTask(p)).start();
+		if (!installing && !version.equals(NMAP_VERSION)) {
+			installing = true;
+			showProgressDialog(
+					"Installing Nmap",
+					"Please wait while Nmap is installed. This should only happen once.",
+					INSTALL_DIALOG_TAG);
+			new Thread(new InstallNmapTask()).start();
+		}
+	}
+
+	private void showProgressDialog(String title, String message, String tag) {
+		ProgressDialogFragment p = ProgressDialogFragment.newInstance(title,
+				message);
+		p.setCancelable(false);
+		p.setRetainInstance(true);
+		p.show(getSupportFragmentManager(), tag);
+	}
+
+	private void dismissDialogFragment(String tag) {
+		DialogFragment dialog = (DialogFragment) getSupportFragmentManager()
+				.findFragmentByTag(tag);
+		if (dialog != null) {
+			dialog.dismiss();
 		}
 	}
 
 	private class InstallNmapTask implements Runnable {
-		private ProgressDialog mProgress;
-
-		public InstallNmapTask(ProgressDialog progress) {
-			mProgress = progress;
-		}
-
 		@Override
 		public void run() {
 			SharedPreferences sp = PreferenceManager
@@ -124,8 +140,6 @@ public class MainActivity extends Activity {
 			} catch (IOException e) {
 				e.printStackTrace();
 
-				mProgress.dismiss();
-
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -143,8 +157,10 @@ public class MainActivity extends Activity {
 										}).create().show();
 					}
 				});
+			} finally {
+				dismissDialogFragment(INSTALL_DIALOG_TAG);
+				installing = false;
 			}
-			mProgress.dismiss();
 		}
 	}
 
@@ -152,23 +168,18 @@ public class MainActivity extends Activity {
 		EditText editText = (EditText) findViewById(R.id.hostname);
 		String host = editText.getText().toString();
 		List<String> args = ArgumentToggleButton.getArguments();
-		ProgressDialog progress = new ProgressDialog(this);
-		progress.setCancelable(false);
-		progress.setTitle("Running command");
-		progress.setMessage("Running command, please wait.");
-		progress.show();
-		new Thread(new RunNmap(host, args, progress)).start();
+		showProgressDialog("Running command", "Running command, please wait.",
+				RUN_DIALOG_TAG);
+		new Thread(new RunNmap(host, args)).start();
 	}
 
 	public class RunNmap implements Runnable {
 		private String mHost;
 		private List<String> mArgs;
-		private ProgressDialog mProgress;
 
-		public RunNmap(String host, List<String> args, ProgressDialog progress) {
+		public RunNmap(String host, List<String> args) {
 			mHost = host;
 			mArgs = args;
-			mProgress = progress;
 		}
 
 		@Override
@@ -193,27 +204,22 @@ public class MainActivity extends Activity {
 				BufferedReader br = new BufferedReader(new InputStreamReader(
 						process.getInputStream()));
 				String line;
-				try {
-					final StringBuilder sb = new StringBuilder();
-					while ((line = br.readLine()) != null) {
-						sb.append(line).append('\n');
-					}
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							TextView results = (TextView) findViewById(R.id.results);
-							results.setTypeface(Typeface.MONOSPACE);
-							results.setText(sb.toString());
-						}
-					});
-
-				} catch (IOException e) {
-					e.printStackTrace();
+				final StringBuilder sb = new StringBuilder();
+				while ((line = br.readLine()) != null) {
+					sb.append(line).append('\n');
 				}
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						TextView results = (TextView) findViewById(R.id.results);
+						results.setTypeface(Typeface.MONOSPACE);
+						results.setText(sb.toString());
+					}
+				});
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				mProgress.dismiss();
+				dismissDialogFragment(RUN_DIALOG_TAG);
 			}
 		}
 	}
