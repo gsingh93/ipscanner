@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-
-import org.apache.http.conn.util.InetAddressUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -24,15 +25,16 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.net.UnknownHostException;
+import org.apache.http.conn.util.InetAddressUtils;
 
 public class MainActivity extends FragmentActivity {
 
@@ -74,7 +76,7 @@ public class MainActivity extends FragmentActivity {
             Intent intent = new Intent(this, ManActivity.class);
             startActivity(intent);
             break;
-        case R.id.action_show_ip:
+        case R.id.action_show_ip: {
             String ipAddress = getIpAddress();
             AlertDialog.Builder b = new AlertDialog.Builder(this);
             String message;
@@ -84,6 +86,20 @@ public class MainActivity extends FragmentActivity {
                 message = "Could not get IP address. Please check if you have a WiFi or data connection.";
             }
             b.setTitle("IP Address").setMessage(message).create().show();
+            break;
+        }
+        case R.id.action_about:
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            String message = "";
+            message += "IPScanner v0.1 by Gulshan Singh\n\n";
+            message += "This is an open source application that uses an ARM port of Nmap.\n\n";
+            message += "Issues should be reported on the Github page: https://github.com/gsingh93/ipscanner/issues\n\n";
+            message += "If there are any options you would like to see added to basic mode, let me know and if there are enough requests, I will add it. Pull requests are welcome.";
+            SpannableString s = new SpannableString(message);
+            Linkify.addLinks(s, Linkify.ALL);
+            AlertDialog d = b.setTitle("About").setMessage(s).create();
+            d.show();
+            ((TextView) d.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
             break;
         }
         return true;
