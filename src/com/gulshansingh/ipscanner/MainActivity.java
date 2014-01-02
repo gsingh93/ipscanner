@@ -30,6 +30,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.net.UnknownHostException;
 
 public class MainActivity extends FragmentActivity {
 
@@ -38,6 +41,8 @@ public class MainActivity extends FragmentActivity {
     private static final String INSTALL_DIALOG_TAG = "install_dialog";
     private static final String RUN_DIALOG_TAG = "run_dialog";
     private static boolean installing = false;
+
+    private static final Pattern ipPattern = Pattern.compile("([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])");
 
     @SuppressLint("NewApi")
     @Override
@@ -184,6 +189,25 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    /**
+     * If host is a valid IP address, return it. If host is a valid
+     * hostname, lookup it's IP address and return that. If an IP
+     * address cannot be found, return host.
+     */
+    public String getIP(String host) {
+        Matcher matcher = ipPattern.matcher(host);
+        if (matcher.matches()) {
+            return host;
+        } else {
+            try {
+                InetAddress address = InetAddress.getByName(host);
+                return address.getHostAddress();
+            } catch (UnknownHostException e) {
+                return host;
+            }
+        }
+    }
+
     public class RunNmap implements Runnable {
         private List<String> mArgs;
 
@@ -193,6 +217,8 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public void run() {
+            String host = mArgs.get(1);
+            mArgs.set(1, getIP(host));
             try {
                 ProcessBuilder pb = new ProcessBuilder(mArgs);
                 pb.redirectErrorStream(true);
