@@ -1,5 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
     <item
         android:id="@+id/action_man_nmap"
         android:showAsAction="never"
@@ -8,9 +7,4 @@
         android:id="@+id/action_show_ip"
         android:showAsAction="never"
         android:title="@string/action_show_ip"/>
-    <item
-        android:id="@+id/action_settings"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
-
 </menu>
