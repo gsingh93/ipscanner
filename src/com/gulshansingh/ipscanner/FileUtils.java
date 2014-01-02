@@ -13,88 +13,88 @@ import android.util.Log;
 
 public class FileUtils {
 
-	public static void chmod(String path, String permissions,
-			boolean isRecursive) throws IOException {
-		ProcessBuilder pb;
-		if (isRecursive) {
-			pb = new ProcessBuilder("/system/bin/chmod", "-R", permissions, path);
-		} else {
-			pb = new ProcessBuilder("/system/bin/chmod", permissions, path);
-		}
-		pb.redirectErrorStream(true);
-		Process process = pb.start();
-		
-		BufferedReader br = new BufferedReader(
-				new InputStreamReader(process.getInputStream()));
-		String line;
-		try {
-			while ((line = br.readLine()) != null) {
-				System.out.println(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    public static void chmod(String path, String permissions,
+                             boolean isRecursive) throws IOException {
+        ProcessBuilder pb;
+        if (isRecursive) {
+            pb = new ProcessBuilder("/system/bin/chmod", "-R", permissions, path);
+        } else {
+            pb = new ProcessBuilder("/system/bin/chmod", permissions, path);
+        }
+        pb.redirectErrorStream(true);
+        Process process = pb.start();
 
-	/**
-	 * Extracts all files in the directory specified relative to the assets
-	 * folder
-	 * 
-	 * @param path
-	 *            The directory to extract
-	 * @throws IOException
-	 */
-	public static void extractAssetDirectory(Context c, String path)
-			throws IOException {
-		String list[] = c.getAssets().list(path);
-		String internalDirPath = c.getFilesDir().getCanonicalPath();
-		if (list.length > 0) { // Path is a folder
-			new File(internalDirPath + '/' + path).mkdir();
-			for (String file : list) {
-				extractAssetDirectory(c, path + '/' + file);
-			}
-		} else { // Path is a file
-			extractAssetFile(c, path);
-		}
-	}
+        BufferedReader br = new BufferedReader(
+                                               new InputStreamReader(process.getInputStream()));
+        String line;
+        try {
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Extracts a single file specified by path relative to the assets folder
-	 * 
-	 * @throws IOException
-	 */
-	public static void extractAssetFile(Context c, String path)
-			throws IOException {
-		InputStream in = null;
-		OutputStream out = null;
-		try {
-			File internalDir = c.getFilesDir();
-			String outPath = internalDir.getCanonicalPath() + "/" + path;
+    /**
+     * Extracts all files in the directory specified relative to the assets
+     * folder
+     *
+     * @param path
+     *            The directory to extract
+     * @throws IOException
+     */
+    public static void extractAssetDirectory(Context c, String path)
+        throws IOException {
+        String list[] = c.getAssets().list(path);
+        String internalDirPath = c.getFilesDir().getCanonicalPath();
+        if (list.length > 0) { // Path is a folder
+            new File(internalDirPath + '/' + path).mkdir();
+            for (String file : list) {
+                extractAssetDirectory(c, path + '/' + file);
+            }
+        } else { // Path is a file
+            extractAssetFile(c, path);
+        }
+    }
 
-			in = c.getAssets().open(path);
-			out = new FileOutputStream(outPath);
-			copyFile(in, out);
+    /**
+     * Extracts a single file specified by path relative to the assets folder
+     *
+     * @throws IOException
+     */
+    public static void extractAssetFile(Context c, String path)
+        throws IOException {
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            File internalDir = c.getFilesDir();
+            String outPath = internalDir.getCanonicalPath() + "/" + path;
 
-			out.flush();
-		} catch (IOException e) {
-			Log.e("FileUtils", "Error extracting " + path);
-			throw e;
-		} finally {
-			if (out != null) {
-				out.close();
-			}
-			if (in != null) {
-				in.close();
-			}
-		}
-	}
+            in = c.getAssets().open(path);
+            out = new FileOutputStream(outPath);
+            copyFile(in, out);
 
-	public static void copyFile(InputStream in, OutputStream out)
-			throws IOException {
-		byte[] buffer = new byte[1024];
-		int read;
-		while ((read = in.read(buffer)) != -1) {
-			out.write(buffer, 0, read);
-		}
-	}
+            out.flush();
+        } catch (IOException e) {
+            Log.e("FileUtils", "Error extracting " + path);
+            throw e;
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
+
+    public static void copyFile(InputStream in, OutputStream out)
+        throws IOException {
+        byte[] buffer = new byte[1024];
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+        }
+    }
 }

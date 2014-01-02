@@ -33,239 +33,239 @@ import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity {
 
-	private static final String NMAP_DIR = "nmap";
-	private static final String NMAP_VERSION = "5.61TEST4";
-	private static final String INSTALL_DIALOG_TAG = "install_dialog";
-	private static final String RUN_DIALOG_TAG = "run_dialog";
-	private static boolean installing = false;
+    private static final String NMAP_DIR = "nmap";
+    private static final String NMAP_VERSION = "5.61TEST4";
+    private static final String INSTALL_DIALOG_TAG = "install_dialog";
+    private static final String RUN_DIALOG_TAG = "run_dialog";
+    private static boolean installing = false;
 
-	@SuppressLint("NewApi")
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+    @SuppressLint("NewApi")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-		TextView command = (TextView) findViewById(R.id.command);
-		TextView results = (TextView) findViewById(R.id.results);
+        TextView command = (TextView) findViewById(R.id.command);
+        TextView results = (TextView) findViewById(R.id.results);
 
-		if (Build.VERSION.SDK_INT >= 11) {
-			command.setTextIsSelectable(true);
-			results.setTextIsSelectable(true);
-		}
+        if (Build.VERSION.SDK_INT >= 11) {
+            command.setTextIsSelectable(true);
+            results.setTextIsSelectable(true);
+        }
 
-		initNmap();
-	}
+        initNmap();
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.action_man_nmap:
-			Intent intent = new Intent(this, ManActivity.class);
-			startActivity(intent);
-			break;
-		case R.id.action_show_ip:
-			String ipAddress = getIpAddress();
-			AlertDialog.Builder b = new AlertDialog.Builder(this);
-			String message;
-			if (ipAddress != null) {
-				message = "Your IP address is " + ipAddress;
-			} else {
-				message = "Could not get IP address. Please check if you have a WiFi or data connection.";
-			}
-			b.setTitle("IP Address").setMessage(message).create().show();
-			break;
-		}
-		return true;
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.action_man_nmap:
+            Intent intent = new Intent(this, ManActivity.class);
+            startActivity(intent);
+            break;
+        case R.id.action_show_ip:
+            String ipAddress = getIpAddress();
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            String message;
+            if (ipAddress != null) {
+                message = "Your IP address is " + ipAddress;
+            } else {
+                message = "Could not get IP address. Please check if you have a WiFi or data connection.";
+            }
+            b.setTitle("IP Address").setMessage(message).create().show();
+            break;
+        }
+        return true;
+    }
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		ArgumentToggleButton.resetArgumentGenerator();
-	}
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ArgumentToggleButton.resetArgumentGenerator();
+    }
 
-	// Need to remove the new fragment that is created on a rotate
-	private void initNmap() {
-		SharedPreferences sp = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		String version = sp.getString("NMAP_VERSION", "");
-		if (!installing && !version.equals(NMAP_VERSION)) {
-			installing = true;
-			showProgressDialog(
-					"Installing Nmap",
-					"Please wait while Nmap is installed. This should only happen once.",
-					INSTALL_DIALOG_TAG);
-			new Thread(new InstallNmapTask()).start();
-		}
-	}
+    // Need to remove the new fragment that is created on a rotate
+    private void initNmap() {
+        SharedPreferences sp = PreferenceManager
+            .getDefaultSharedPreferences(this);
+        String version = sp.getString("NMAP_VERSION", "");
+        if (!installing && !version.equals(NMAP_VERSION)) {
+            installing = true;
+            showProgressDialog(
+                               "Installing Nmap",
+                               "Please wait while Nmap is installed. This should only happen once.",
+                               INSTALL_DIALOG_TAG);
+            new Thread(new InstallNmapTask()).start();
+        }
+    }
 
-	private void showProgressDialog(String title, String message, String tag) {
-		ProgressDialogFragment p = ProgressDialogFragment.newInstance(title,
-				message);
-		p.setCancelable(false);
-		p.setRetainInstance(true);
-		p.show(getSupportFragmentManager(), tag);
-	}
+    private void showProgressDialog(String title, String message, String tag) {
+        ProgressDialogFragment p = ProgressDialogFragment.newInstance(title,
+                                                                      message);
+        p.setCancelable(false);
+        p.setRetainInstance(true);
+        p.show(getSupportFragmentManager(), tag);
+    }
 
-	private void dismissDialogFragment(String tag) {
-		DialogFragment dialog = (DialogFragment) getSupportFragmentManager()
-				.findFragmentByTag(tag);
-		if (dialog != null) {
-			dialog.dismiss();
-		}
-	}
+    private void dismissDialogFragment(String tag) {
+        DialogFragment dialog = (DialogFragment) getSupportFragmentManager()
+            .findFragmentByTag(tag);
+        if (dialog != null) {
+            dialog.dismiss();
+        }
+    }
 
-	private class InstallNmapTask implements Runnable {
-		@Override
-		public void run() {
-			SharedPreferences sp = PreferenceManager
-					.getDefaultSharedPreferences(MainActivity.this);
+    private class InstallNmapTask implements Runnable {
+        @Override
+        public void run() {
+            SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(MainActivity.this);
 
-			try {
-				FileUtils.extractAssetDirectory(MainActivity.this, NMAP_DIR);
-				FileUtils.chmod(getFilesDir().getCanonicalPath() + '/'
-						+ NMAP_DIR, "744", true);
-				boolean result = sp.edit()
-						.putString("NMAP_VERSION", NMAP_VERSION).commit();
-				if (!result) {
-					Log.e("MainActivity", "Writing new version failed");
-					throw new IOException();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+            try {
+                FileUtils.extractAssetDirectory(MainActivity.this, NMAP_DIR);
+                FileUtils.chmod(getFilesDir().getCanonicalPath() + '/'
+                                + NMAP_DIR, "744", true);
+                boolean result = sp.edit()
+                    .putString("NMAP_VERSION", NMAP_VERSION).commit();
+                if (!result) {
+                    Log.e("MainActivity", "Writing new version failed");
+                    throw new IOException();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
 
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						new AlertDialog.Builder(MainActivity.this)
-								.setMessage(
-										"Nmap installation failed, please try again. If the problem continues, please contact the developer. Exiting.")
-								.setPositiveButton("Exit",
-										new OnClickListener() {
-											@Override
-											public void onClick(
-													DialogInterface dialog,
-													int which) {
-												finish();
-											}
-										}).create().show();
-					}
-				});
-			} finally {
-				dismissDialogFragment(INSTALL_DIALOG_TAG);
-				installing = false;
-			}
-		}
-	}
+                runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            new AlertDialog.Builder(MainActivity.this)
+                                .setMessage(
+                                            "Nmap installation failed, please try again. If the problem continues, please contact the developer. Exiting.")
+                                .setPositiveButton("Exit",
+                                                   new OnClickListener() {
+                                                       @Override
+                                                       public void onClick(
+                                                                           DialogInterface dialog,
+                                                                           int which) {
+                                                           finish();
+                                                       }
+                                                   }).create().show();
+                        }
+                    });
+            } finally {
+                dismissDialogFragment(INSTALL_DIALOG_TAG);
+                installing = false;
+            }
+        }
+    }
 
-	public void runClicked(View v) {
-		try {
-			EditText editText = (EditText) findViewById(R.id.hostname);
-			String host = editText.getText().toString();
+    public void runClicked(View v) {
+        try {
+            EditText editText = (EditText) findViewById(R.id.hostname);
+            String host = editText.getText().toString();
 
-			List<String> argList = ArgumentToggleButton.getArguments();
-			List<String> args = new ArrayList<String>();
-			String internalDirPath = getFilesDir().getCanonicalPath();
-			args.add(internalDirPath + "/nmap/bin/nmap");
-			args.add(host);
-			args.addAll(argList);
+            List<String> argList = ArgumentToggleButton.getArguments();
+            List<String> args = new ArrayList<String>();
+            String internalDirPath = getFilesDir().getCanonicalPath();
+            args.add(internalDirPath + "/nmap/bin/nmap");
+            args.add(host);
+            args.addAll(argList);
 
-			showProgressDialog("Running command", "Running command: "
-					+ getCommandText(args), RUN_DIALOG_TAG);
-			new Thread(new RunNmap(args)).start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            showProgressDialog("Running command", "Running command: "
+                               + getCommandText(args), RUN_DIALOG_TAG);
+            new Thread(new RunNmap(args)).start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	public class RunNmap implements Runnable {
-		private List<String> mArgs;
+    public class RunNmap implements Runnable {
+        private List<String> mArgs;
 
-		public RunNmap(List<String> args) {
-			mArgs = args;
-		}
+        public RunNmap(List<String> args) {
+            mArgs = args;
+        }
 
-		@Override
-		public void run() {
-			try {
-				ProcessBuilder pb = new ProcessBuilder(mArgs);
-				pb.redirectErrorStream(true);
-				Process process = pb.start();
-				BufferedReader br = new BufferedReader(new InputStreamReader(
-						process.getInputStream()));
-				String line;
-				final StringBuilder sb = new StringBuilder();
-				while ((line = br.readLine()) != null) {
-					sb.append(line).append('\n');
-				}
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						TextView command = (TextView) findViewById(R.id.command);
-						TextView results = (TextView) findViewById(R.id.results);
-						results.setTypeface(Typeface.MONOSPACE);
-						command.setTypeface(Typeface.MONOSPACE);
-						results.setText(sb.toString());
-						command.setText("$ " + getCommandText(mArgs));
-					}
-				});
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				dismissDialogFragment(RUN_DIALOG_TAG);
-			}
-		}
-	}
+        @Override
+        public void run() {
+            try {
+                ProcessBuilder pb = new ProcessBuilder(mArgs);
+                pb.redirectErrorStream(true);
+                Process process = pb.start();
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                                                                             process.getInputStream()));
+                String line;
+                final StringBuilder sb = new StringBuilder();
+                while ((line = br.readLine()) != null) {
+                    sb.append(line).append('\n');
+                }
+                runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TextView command = (TextView) findViewById(R.id.command);
+                            TextView results = (TextView) findViewById(R.id.results);
+                            results.setTypeface(Typeface.MONOSPACE);
+                            command.setTypeface(Typeface.MONOSPACE);
+                            results.setText(sb.toString());
+                            command.setText("$ " + getCommandText(mArgs));
+                        }
+                    });
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                dismissDialogFragment(RUN_DIALOG_TAG);
+            }
+        }
+    }
 
-	private String getCommandText(List<String> args) {
-		StringBuilder sb = new StringBuilder();
-		boolean first = true;
-		for (String arg : args) {
-			if (first) {
-				sb.append("nmap");
-				first = false;
-			} else {
-				sb.append(arg);
-			}
-			sb.append(" ");
-		}
+    private String getCommandText(List<String> args) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String arg : args) {
+            if (first) {
+                sb.append("nmap");
+                first = false;
+            } else {
+                sb.append(arg);
+            }
+            sb.append(" ");
+        }
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 
-	private String getIpAddress() {
-		// Fallback address
-		String ipv6Addr = null;
+    private String getIpAddress() {
+        // Fallback address
+        String ipv6Addr = null;
 
-		try {
-			List<NetworkInterface> interfaces = Collections
-					.list(NetworkInterface.getNetworkInterfaces());
-			for (NetworkInterface intf : interfaces) {
-				List<InetAddress> addrs = Collections.list(intf
-						.getInetAddresses());
-				for (InetAddress addr : addrs) {
-					if (!addr.isLoopbackAddress()) {
-						String sAddr = addr.getHostAddress().toUpperCase(
-								Locale.US);
-						boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
-						if (isIPv4) {
-							return sAddr;
-						} else {
-							ipv6Addr = sAddr;
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        try {
+            List<NetworkInterface> interfaces = Collections
+                .list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf
+                                                           .getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress()) {
+                        String sAddr = addr.getHostAddress().toUpperCase(
+                                                                         Locale.US);
+                        boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
+                        if (isIPv4) {
+                            return sAddr;
+                        } else {
+                            ipv6Addr = sAddr;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		return ipv6Addr;
-	}
+        return ipv6Addr;
+    }
 }
