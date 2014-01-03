@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +34,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import org.apache.http.conn.util.InetAddressUtils;
 
@@ -51,6 +54,21 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TabHost tabHost = (TabHost) findViewById(R.id.tabhost);
+        tabHost.setup();
+
+        TabSpec basicSpec = tabHost
+            .newTabSpec("Basic")
+            .setIndicator("Basic")
+            .setContent(R.id.basic_tab);
+        TabSpec advancedSpec = tabHost
+            .newTabSpec("Advanced")
+            .setIndicator("Advanced")
+            .setContent(R.id.advanced_tab);
+
+        tabHost.addTab(basicSpec);
+        tabHost.addTab(advancedSpec);
 
         TextView command = (TextView) findViewById(R.id.command);
         TextView results = (TextView) findViewById(R.id.results);
@@ -187,19 +205,28 @@ public class MainActivity extends FragmentActivity {
 
     public void runClicked(View v) {
         try {
-            EditText editText = (EditText) findViewById(R.id.hostname);
-            String host = editText.getText().toString();
-
-            List<String> argList = ArgumentToggleButton.getArguments();
             List<String> args = new ArrayList<String>();
             String internalDirPath = getFilesDir().getCanonicalPath();
             args.add(internalDirPath + "/nmap/bin/nmap");
-            args.add(host);
-            args.addAll(argList);
+
+            boolean advanced = v.getId() == R.id.advanced_run;
+            if (!advanced) {
+                EditText editText = (EditText) findViewById(R.id.hostname);
+                String host = editText.getText().toString();
+
+                List<String> argList = ArgumentToggleButton.getArguments();
+                args.add(host);
+                args.addAll(argList);
+            } else {
+                EditText editText = (EditText) findViewById(R.id.arguments);
+                String arguments = editText.getText().toString();
+
+                args.addAll(Arrays.asList(arguments.split(" ")));
+            }
 
             showProgressDialog("Running command", "Running command: "
                                + getCommandText(args), RUN_DIALOG_TAG);
-            new Thread(new RunNmap(args)).start();
+            new Thread(new RunNmap(args, advanced)).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -226,9 +253,11 @@ public class MainActivity extends FragmentActivity {
 
     public class RunNmap implements Runnable {
         private List<String> mArgs;
+        private boolean mAdvanced;
 
-        public RunNmap(List<String> args) {
+        public RunNmap(List<String> args, boolean advanced) {
             mArgs = args;
+            mAdvanced = advanced;
         }
 
         @Override
@@ -239,8 +268,7 @@ public class MainActivity extends FragmentActivity {
                 ProcessBuilder pb = new ProcessBuilder(mArgs);
                 pb.redirectErrorStream(true);
                 Process process = pb.start();
-                BufferedReader br = new BufferedReader(new InputStreamReader(
-                                                                             process.getInputStream()));
+                BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
                 final StringBuilder sb = new StringBuilder();
                 while ((line = br.readLine()) != null) {
@@ -249,8 +277,14 @@ public class MainActivity extends FragmentActivity {
                 runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            TextView command = (TextView) findViewById(R.id.command);
-                            TextView results = (TextView) findViewById(R.id.results);
+                            TextView command, results;
+                            if (mAdvanced) {
+                                command = (TextView) findViewById(R.id.command_advanced);
+                                results = (TextView) findViewById(R.id.results_advanced);
+                            } else {
+                                command = (TextView) findViewById(R.id.command);
+                                results = (TextView) findViewById(R.id.results);
+                            }
                             results.setTypeface(Typeface.MONOSPACE);
                             command.setTypeface(Typeface.MONOSPACE);
                             results.setText(sb.toString());
