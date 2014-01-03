@@ -59,12 +59,6 @@
                     android:layout_gravity="center_horizontal" >
 
                     <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/sync_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-sS" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
                         android:id="@+id/no_ping_toggle_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -105,10 +99,52 @@
                         app:argument="-sn" />
 
                     <com.gulshansingh.ipscanner.ArgumentToggleButton
+                        android:id="@+id/sync_toggle_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:argument="-sS" />
+
+                    <com.gulshansingh.ipscanner.ArgumentToggleButton
                         android:id="@+id/tcp_toggle_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:argument="-sT" />
+
+                    <com.gulshansingh.ipscanner.ArgumentToggleButton
+                        android:id="@+id/udp_toggle_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:argument="-sU" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal" >
+
+                    <com.gulshansingh.ipscanner.ArgumentToggleButton
+                        android:id="@+id/os_detection_toggle_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:argument="-O" />
+
+                    <com.gulshansingh.ipscanner.ArgumentToggleButton
+                        android:id="@+id/version_detection_toggle_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:argument="-sV" />
+
+                    <com.gulshansingh.ipscanner.ArgumentToggleButton
+                        android:id="@+id/aggressive_toggle_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:argument="-A" />
+
+                    <com.gulshansingh.ipscanner.ArgumentToggleButton
+                        android:id="@+id/verbose_toggle_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:argument="-v" />
                 </LinearLayout>
 
                 <HorizontalScrollView
