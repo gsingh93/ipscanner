@@ -7,6 +7,7 @@
     <string name="action_show_ip">Show IP</string>
     <string name="action_about">About</string>
     <string name="run_button">Run</string>
+    <string name="run_sudo_button">Run sudo</string>
     <string name="hostname_hint">Hostname or IP Address</string>
     <string name="argument_hint">Arguments</string>
     <string name="title_activity_man">ManActivity</string>

@@ -1,19 +1,5 @@
 package com.gulshansingh.ipscanner;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -37,7 +23,22 @@ import android.widget.EditText;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
+
 import org.apache.http.conn.util.InetAddressUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends FragmentActivity {
 
@@ -203,10 +204,21 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    public void runSudoClicked(View v) {
+        run(v, true);
+    }
+
     public void runClicked(View v) {
+        run(v, false);
+    }
+
+    private void run(View v, boolean isSudo) {
         try {
             List<String> args = new ArrayList<String>();
             String internalDirPath = getFilesDir().getCanonicalPath();
+            if (isSudo) {
+                args.add("su");
+            }
             args.add(internalDirPath + "/nmap/bin/nmap");
 
             boolean advanced = v.getId() == R.id.advanced_run;
@@ -292,6 +304,15 @@ public class MainActivity extends FragmentActivity {
                         }
                     });
             } catch (IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+                        String message = "Something went wrong. Did you try to run as sudo even though your device isn't rooted?";
+                        b.setTitle("Error").setMessage(message).create().show();
+                    }
+                });
+
                 e.printStackTrace();
             } finally {
                 dismissDialogFragment(RUN_DIALOG_TAG);

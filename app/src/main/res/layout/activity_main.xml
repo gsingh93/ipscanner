@@ -44,13 +44,24 @@
                         android:hint="@string/hostname_hint"
                         android:inputType="textNoSuggestions" />
 
-                    <Button
-                        android:id="@+id/basic_run"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight=".2"
-                        android:onClick="runClicked"
-                        android:text="@string/run_button" />
+                        android:orientation="vertical">
+                        <Button
+                            android:id="@+id/basic_run"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="runClicked"
+                            android:text="@string/run_button" />
+                        <Button
+                            android:id="@+id/basic_run_sudo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="runSudoClicked"
+                            android:text="@string/run_sudo_button" />
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -196,13 +207,26 @@
                         android:hint="@string/argument_hint"
                         android:inputType="textNoSuggestions" />
 
-                    <Button
-                        android:id="@+id/advanced_run"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight=".2"
-                        android:onClick="runClicked"
-                        android:text="@string/run_button" />
+                        android:orientation="vertical">
+
+                        <Button
+                            android:id="@+id/advanced_run"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="runClicked"
+                            android:text="@string/run_button" />
+
+                        <Button
+                            android:id="@+id/advanced_run_sudo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="runSudoClicked"
+                            android:text="@string/run_sudo_button" />
+
+                        </LinearLayout>
                 </LinearLayout>
                 <HorizontalScrollView
                     android:layout_width="match_parent"
