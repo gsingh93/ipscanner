@@ -1,5 +1,7 @@
-/.classpath
-/.project
-/.settings
-/bin
-/gen
+*.apk
+manifest-merger-release-report.txt
+*.iml
+.gradle
+local.properties
+/.idea
+build
