@@ -272,6 +272,17 @@ public class MainActivity extends FragmentActivity {
             mAdvanced = advanced;
         }
 
+        private void showErrorDialog() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+                    String message = "Something went wrong. Did you try to run as sudo even though your device isn't rooted?";
+                    b.setTitle("Error").setMessage(message).create().show();
+                }
+            });
+        }
+
         @Override
         public void run() {
             String host = mArgs.get(1);
@@ -286,7 +297,10 @@ public class MainActivity extends FragmentActivity {
                 while ((line = br.readLine()) != null) {
                     sb.append(line).append('\n');
                 }
-                runOnUiThread(new Runnable() {
+                if (process.waitFor() != 0) {
+                    showErrorDialog();
+                } else {
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             TextView command, results;
@@ -303,16 +317,11 @@ public class MainActivity extends FragmentActivity {
                             command.setText("$ " + getCommandText(mArgs));
                         }
                     });
+                }
             } catch (IOException e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
-                        String message = "Something went wrong. Did you try to run as sudo even though your device isn't rooted?";
-                        b.setTitle("Error").setMessage(message).create().show();
-                    }
-                });
-
+                showErrorDialog();
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
                 dismissDialogFragment(RUN_DIALOG_TAG);
