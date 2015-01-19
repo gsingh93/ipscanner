@@ -218,6 +218,7 @@ public class MainActivity extends FragmentActivity {
             String internalDirPath = getFilesDir().getCanonicalPath();
             if (isSudo) {
                 args.add("su");
+                args.add("-c");
             }
             args.add(internalDirPath + "/nmap/bin/nmap");
 
@@ -334,7 +335,7 @@ public class MainActivity extends FragmentActivity {
         boolean appendedNmap = false;
         for (String arg : args) {
             if (!appendedNmap) {
-                if (arg.equals("su")) {
+                if (arg.equals("su") || arg.equals("-c")) {
                     sb.append(arg);
                 } else {
                     sb.append("nmap");
