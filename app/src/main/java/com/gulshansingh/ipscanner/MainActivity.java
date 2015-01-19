@@ -157,7 +157,7 @@ public class MainActivity extends FragmentActivity {
         DialogFragment dialog = (DialogFragment) getSupportFragmentManager()
             .findFragmentByTag(tag);
         if (dialog != null) {
-            dialog.dismiss();
+            dialog.dismissAllowingStateLoss();
         }
     }
 
