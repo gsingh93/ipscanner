@@ -331,11 +331,15 @@ public class MainActivity extends FragmentActivity {
 
     private String getCommandText(List<String> args) {
         StringBuilder sb = new StringBuilder();
-        boolean first = true;
+        boolean appendedNmap = false;
         for (String arg : args) {
-            if (first) {
-                sb.append("nmap");
-                first = false;
+            if (!appendedNmap) {
+                if (arg.equals("su")) {
+                    sb.append(arg);
+                } else {
+                    sb.append("nmap");
+                    appendedNmap = true;
+                }
             } else {
                 sb.append(arg);
             }
