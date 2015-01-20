@@ -26,235 +26,242 @@
                 android:id="@+id/basic_tab"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical" >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/beginner_explanation" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <EditText
-                        android:id="@+id/hostname"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight=".8"
-                        android:hint="@string/hostname_hint"
-                        android:inputType="textNoSuggestions" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <Button
-                            android:id="@+id/basic_run"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:onClick="runClicked"
-                            android:text="@string/run_button" />
-                        <Button
-                            android:id="@+id/basic_run_sudo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:onClick="runSudoClicked"
-                            android:text="@string/run_sudo_button" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal" >
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/no_ping_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-Pn" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/port_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-p"
-                        app:label="Port"
-                        app:takes_arg="true" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/random_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-iR"
-                        app:label="Random"
-                        app:takes_arg="true" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/list_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-sL" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal" >
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/disable_port_scan_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-sn" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/sync_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-sS" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/tcp_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-sT" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/udp_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-sU" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal" >
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/os_detection_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-O" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/version_detection_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-sV" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/aggressive_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-A" />
-
-                    <com.gulshansingh.ipscanner.ArgumentToggleButton
-                        android:id="@+id/verbose_toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:argument="-v" />
-                </LinearLayout>
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <TextView
-                        android:id="@+id/command"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:freezesText="true" />
-                </HorizontalScrollView>
-
+                android:orientation="vertical">
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
-
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" >
-
-                        <TextView
-                            android:id="@+id/results"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:freezesText="true" />
-                    </HorizontalScrollView>
-                </ScrollView>
-
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/advanced_tab"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical" >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/advanced_explanation" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-                    <EditText
-                        android:id="@+id/arguments"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight=".8"
-                        android:hint="@string/argument_hint"
-                        android:inputType="textNoSuggestions" />
-
+                    android:layout_height="match_parent">
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <Button
-                            android:id="@+id/advanced_run"
+                        android:orientation="vertical" >
+                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:onClick="runClicked"
-                            android:text="@string/run_button" />
+                            android:text="@string/beginner_explanation" />
 
-                        <Button
-                            android:id="@+id/advanced_run_sudo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:onClick="runSudoClicked"
-                            android:text="@string/run_sudo_button" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" >
+
+                            <EditText
+                                android:id="@+id/hostname"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight=".8"
+                                android:hint="@string/hostname_hint"
+                                android:inputType="textNoSuggestions" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+                                <Button
+                                    android:id="@+id/basic_run"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:onClick="runClicked"
+                                    android:text="@string/run_button" />
+                                <Button
+                                    android:id="@+id/basic_run_sudo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:onClick="runSudoClicked"
+                                    android:text="@string/run_sudo_button" />
+                            </LinearLayout>
 
                         </LinearLayout>
-                </LinearLayout>
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
 
-                    <TextView
-                        android:id="@+id/command_advanced"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:freezesText="true" />
-                </HorizontalScrollView>
-
-                <ScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
-
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" >
-
-                        <TextView
-                            android:id="@+id/results_advanced"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:freezesText="true" />
-                    </HorizontalScrollView>
-                </ScrollView>
+                            android:layout_gravity="center_horizontal" >
 
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/no_ping_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-Pn" />
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/port_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-p"
+                                app:label="Port"
+                                app:takes_arg="true" />
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/random_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-iR"
+                                app:label="Random"
+                                app:takes_arg="true" />
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/list_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-sL" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal" >
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/disable_port_scan_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-sn" />
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/sync_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-sS" />
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/tcp_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-sT" />
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/udp_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-sU" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal" >
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/os_detection_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-O" />
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/version_detection_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-sV" />
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/aggressive_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-A" />
+
+                            <com.gulshansingh.ipscanner.ArgumentToggleButton
+                                android:id="@+id/verbose_toggle_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:argument="-v" />
+                        </LinearLayout>
+
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" >
+
+                            <TextView
+                                android:id="@+id/command"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:freezesText="true" />
+                        </HorizontalScrollView>
+
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" >
+
+                            <TextView
+                                android:id="@+id/results"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:freezesText="true" />
+                        </HorizontalScrollView>
+                    </LinearLayout>
+                </ScrollView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:id="@+id/advanced_tab">
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/advanced_explanation" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" >
+                            <EditText
+                                android:id="@+id/arguments"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight=".8"
+                                android:hint="@string/argument_hint"
+                                android:inputType="textNoSuggestions" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <Button
+                                    android:id="@+id/advanced_run"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:onClick="runClicked"
+                                    android:text="@string/run_button" />
+
+                                <Button
+                                    android:id="@+id/advanced_run_sudo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:onClick="runSudoClicked"
+                                    android:text="@string/run_sudo_button" />
+
+                            </LinearLayout>
+                        </LinearLayout>
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" >
+
+                            <TextView
+                                android:id="@+id/command_advanced"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:freezesText="true" />
+                        </HorizontalScrollView>
+
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" >
+
+                            <TextView
+                                android:id="@+id/results_advanced"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:freezesText="true"/>
+                        </HorizontalScrollView>
+                    </LinearLayout>
+                </ScrollView>
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

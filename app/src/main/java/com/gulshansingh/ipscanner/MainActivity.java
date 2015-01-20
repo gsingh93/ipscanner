@@ -222,7 +222,7 @@ public class MainActivity extends FragmentActivity {
             }
             args.add(internalDirPath + "/nmap/bin/nmap");
 
-            boolean advanced = v.getId() == R.id.advanced_run;
+            boolean advanced = v.getId() == R.id.advanced_run || v.getId() == R.id.advanced_run_sudo;
             if (!advanced) {
                 EditText editText = (EditText) findViewById(R.id.hostname);
                 String host = editText.getText().toString();
@@ -233,7 +233,6 @@ public class MainActivity extends FragmentActivity {
             } else {
                 EditText editText = (EditText) findViewById(R.id.arguments);
                 String arguments = editText.getText().toString();
-
                 args.addAll(Arrays.asList(arguments.split(" ")));
             }
 
@@ -278,7 +277,7 @@ public class MainActivity extends FragmentActivity {
                 @Override
                 public void run() {
                     AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
-                    String message = "Something went wrong. Did you try to run as sudo even though your device isn't rooted?";
+                    String message = "Something went wrong. Check the command output if this was an Nmap error, otherwise if you are running with \"Run sudo\" make sure your device is properly rooted.";
                     b.setTitle("Error").setMessage(message).create().show();
                 }
             });
@@ -286,8 +285,12 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public void run() {
-            String host = mArgs.get(1);
-            mArgs.set(1, getIP(host));
+            int hostIndex = 1;
+            if (mArgs.get(0).equals("su")) {
+                hostIndex = 3;
+            }
+            String host = mArgs.get(hostIndex);
+            mArgs.set(hostIndex, getIP(host));
             try {
                 ProcessBuilder pb = new ProcessBuilder(mArgs);
                 pb.redirectErrorStream(true);
@@ -298,31 +301,31 @@ public class MainActivity extends FragmentActivity {
                 while ((line = br.readLine()) != null) {
                     sb.append(line).append('\n');
                 }
-                if (process.waitFor() != 0) {
-                    showErrorDialog();
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            TextView command, results;
-                            if (mAdvanced) {
-                                command = (TextView) findViewById(R.id.command_advanced);
-                                results = (TextView) findViewById(R.id.results_advanced);
-                            } else {
-                                command = (TextView) findViewById(R.id.command);
-                                results = (TextView) findViewById(R.id.results);
-                            }
-                            results.setTypeface(Typeface.MONOSPACE);
-                            command.setTypeface(Typeface.MONOSPACE);
-                            results.setText(sb.toString());
-                            command.setText("$ " + getCommandText(mArgs));
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView command, results;
+                        if (mAdvanced) {
+                            command = (TextView) findViewById(R.id.command_advanced);
+                            results = (TextView) findViewById(R.id.results_advanced);
+                        } else {
+                            command = (TextView) findViewById(R.id.command);
+                            results = (TextView) findViewById(R.id.results);
                         }
-                    });
-                }
+                        results.setTypeface(Typeface.MONOSPACE);
+                        command.setTypeface(Typeface.MONOSPACE);
+                        String resultString = sb.toString();
+                        if (resultString.equals("")) {
+                            resultString = "No output, an error may have occurred";
+                        }
+                        results.setText(resultString);
+
+                        command.setText("$ " + getCommandText(mArgs));
+                    }
+                });
             } catch (IOException e) {
                 showErrorDialog();
-                e.printStackTrace();
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
                 dismissDialogFragment(RUN_DIALOG_TAG);
